@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>For Lovie 🌸</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:        #e8789a;
+      --rose-light:  #f5a8c0;
+      --rose-dark:   #c4547a;
+      --text-main:   #fceef5;
+      --text-soft:   #c9a0b8;
+      --text-muted:  #876070;
+      --card-bg:     rgba(255,255,255,0.042);
+      --card-border: rgba(232,120,154,0.17);
+    }
+
+    html, body {
+      min-height: 100vh;
+      font-family: 'DM Sans', sans-serif;
+      background: radial-gradient(ellipse at 28% 18%, #3a1030 0%, #190918 45%, #0c0814 100%);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    #particles-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+
+    .stage {
+      position: relative; z-index: 1; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem 1.25rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 28px; padding: 3.5rem 3rem;
+      max-width: 520px; width: 100%; text-align: center;
+      backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      box-shadow: 0 0 70px rgba(232,120,154,0.07), 0 36px 90px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.055);
+      position: relative; overflow: hidden;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg,transparent,rgba(232,120,154,0.45),transparent);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+    .screen.exit   { display: block; animation: screenOut 0.28s ease forwards; }
+    @keyframes screenIn  { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes screenOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-14px)} }
+
+    .icon-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg,rgba(232,120,154,0.18),rgba(196,84,122,0.08));
+      border: 1px solid rgba(232,120,154,0.22); font-size: 1.8rem; margin-bottom: 1.8rem;
+      box-shadow: 0 0 28px rgba(232,120,154,0.12); animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+    .eyebrow { font-size: 0.68rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--rose); opacity: 0.7; margin-bottom: 1rem; }
+    .headline { font-family:'Playfair Display',serif; font-size:clamp(1.65rem,5vw,2.3rem); font-weight:400; line-height:1.28; color:var(--text-main); margin-bottom:0.85rem; }
+    .subtext  { font-size:0.93rem; font-weight:300; color:var(--text-soft); line-height:1.65; margin-bottom:2.4rem; }
+
+    .btn {
+      display:inline-flex; align-items:center; gap:0.45rem;
+      padding:0.88rem 2.3rem; border-radius:100px; border:none; cursor:pointer;
+      font-family:'DM Sans',sans-serif; font-size:0.94rem; font-weight:500; letter-spacing:0.025em;
+      color:#fff;
+      background:linear-gradient(135deg,var(--rose-dark) 0%,var(--rose) 60%,#f0a0bb 100%);
+      box-shadow:0 4px 22px rgba(232,120,154,0.33),inset 0 1px 0 rgba(255,255,255,0.1);
+      transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s ease,opacity 0.25s;
+      position:relative; overflow:hidden;
+    }
+    .btn::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.1));border-radius:inherit; }
+    .btn:hover:not(:disabled)  { transform:translateY(-3px) scale(1.03); box-shadow:0 8px 32px rgba(232,120,154,0.44),inset 0 1px 0 rgba(255,255,255,0.1); }
+    .btn:active:not(:disabled) { transform:translateY(-1px) scale(0.99); }
+    .btn:disabled { opacity:0.35; cursor:default; transform:none!important; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
+
+    .btn-ghost {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.72rem 1.55rem; border-radius:100px;
+      border:1px solid rgba(232,120,154,0.2); background:transparent;
+      color:var(--text-soft); font-family:'DM Sans',sans-serif; font-size:0.86rem; font-weight:400; cursor:pointer;
+      transition:all 0.22s ease;
+    }
+    .btn-ghost:hover { border-color:rgba(232,120,154,0.48); color:var(--rose-light); background:rgba(232,120,154,0.06); transform:translateX(-2px); }
+    .btn-ghost:disabled { opacity:0.22; cursor:default; pointer-events:none; }
+
+    .nav-row { display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap; margin-top:0.4rem; }
+
+    /* ── SUSPENSE ── */
+    .quiz-step { display:none; }
+    .quiz-step.active { display:block; animation: screenIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+
+    .suspense-question {
+      font-family:'Playfair Display',serif; font-size:clamp(1rem,3.5vw,1.28rem);
+      font-style:italic; color:var(--text-soft); line-height:1.6; margin-bottom:1.8rem;
+    }
+    .choices { display:flex; flex-direction:column; gap:0.68rem; margin-bottom:1rem; text-align:left; }
+    .choice-btn {
+      padding:0.8rem 1.15rem; border-radius:14px;
+      border:1px solid rgba(232,120,154,0.17); background:rgba(232,120,154,0.035);
+      color:var(--text-main); font-family:'DM Sans',sans-serif; font-size:0.89rem;
+      cursor:pointer; text-align:left; transition:all 0.22s ease;
+      display:flex; align-items:center; gap:0.6rem;
+    }
+    .choice-btn .ci { font-size:1rem; flex-shrink:0; }
+    .choice-btn:hover  { border-color:rgba(232,120,154,0.44); background:rgba(232,120,154,0.09); transform:translateX(4px); }
+    .choice-btn.correct{ border-color:#6dcfa0; background:rgba(109,207,160,0.09); color:#aef0cc; pointer-events:none; }
+    .choice-btn.wrong  { border-color:rgba(220,70,70,0.3); background:rgba(220,70,70,0.05); color:rgba(255,140,140,0.55); pointer-events:none; }
+    .choice-btn.locked { pointer-events:none; opacity:0.42; }
+
+    .suspense-hint { font-size:0.79rem; color:var(--text-muted); min-height:1.2rem; margin-bottom:0.6rem; transition:color 0.3s; }
+    .hint-wrong { color:#e07070!important; }
+    .hint-right { color:#7ddfaa!important; }
+
+    .quiz-progress { display:flex; gap:6px; justify-content:center; margin-bottom:1.4rem; }
+    .q-pip { width:28px; height:4px; border-radius:2px; background:rgba(232,120,154,0.15); transition:all 0.3s ease; }
+    .q-pip.done   { background:rgba(232,120,154,0.5); }
+    .q-pip.active { background:var(--rose); box-shadow:0 0 8px rgba(232,120,154,0.5); }
+
+    @keyframes shake {
+      0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px)}
+      40%{transform:translateX(9px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(4px)}
+    }
+    .shake { animation:shake 0.42s ease; }
+
+    .sep { display:flex; align-items:center; gap:10px; margin:0.5rem 0 1.4rem; opacity:0.2; }
+    .sep span { flex:1; height:1px; background:var(--rose); }
+    .sep em { font-style:normal; font-size:0.58rem; color:var(--rose); }
+
+    /* ── MESSAGES ── */
+    .message-wrap {
+      min-height:120px; display:flex; align-items:center; justify-content:center;
+      margin-bottom:1.8rem; position:relative;
+    }
+    .message-text {
+      font-family:'Playfair Display',serif; font-size:clamp(1.28rem,4vw,1.7rem);
+      font-weight:400; line-height:1.45; color:var(--text-main);
+      position:absolute; width:100%; opacity:0; transform:translateY(18px);
+      transition:opacity 0.52s cubic-bezier(0.22,1,0.36,1),transform 0.52s cubic-bezier(0.22,1,0.36,1);
+      pointer-events:none;
+    }
+    .message-text.visible    { opacity:1; transform:translateY(0); pointer-events:auto; }
+    .message-text.exit-up    { opacity:0; transform:translateY(-14px); }
+    .message-text.exit-down  { opacity:0; transform:translateY(18px); }
+
+    .progress-dots { display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:1.8rem; min-height:10px; }
+    .dot { width:6px; height:6px; border-radius:50%; background:rgba(232,120,154,0.2); transition:all 0.3s ease; }
+    .dot.active { background:var(--rose); box-shadow:0 0 8px rgba(232,120,154,0.5); transform:scale(1.35); }
+    .dot.done   { background:rgba(232,120,154,0.42); }
+
+    .btn.final-state { background:linear-gradient(135deg,#7b4d8a,#c46e96); animation:pulse-glow 2.5s ease-in-out infinite; }
+    @keyframes pulse-glow { 0%,100%{box-shadow:0 4px 22px rgba(196,110,150,0.35)} 50%{box-shadow:0 4px 42px rgba(196,110,150,0.68)} }
+
+    /* ── LETTER ── */
+    #screen-letter { text-align:left; }
+
+    .wax-seal {
+      display:flex; align-items:center; justify-content:center;
+      width:56px; height:56px; border-radius:50%;
+      background:radial-gradient(circle at 38% 35%,#c4547a,#7b1540);
+      border:2px solid rgba(232,120,154,0.35); font-size:1.4rem;
+      margin:0 auto 1.5rem;
+      box-shadow:0 4px 18px rgba(196,84,122,0.35),inset 0 1px 0 rgba(255,255,255,0.1);
+      animation:float 5s ease-in-out infinite;
+    }
+    .letter-center { text-align:center; }
+
+    .letter-paper {
+      background:rgba(255,245,250,0.038);
+      border:1px solid rgba(232,120,154,0.13); border-radius:18px;
+      padding:2.4rem 2rem; position:relative; margin-bottom:2rem; overflow:hidden;
+    }
+    .letter-paper::after {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:repeating-linear-gradient(to bottom,transparent,transparent 35px,rgba(232,120,154,0.042) 35px,rgba(232,120,154,0.042) 36px);
+      border-radius:inherit;
+    }
+    .letter-date { font-size:0.74rem; color:var(--text-muted); letter-spacing:0.06em; margin-bottom:1.4rem; }
+    .letter-salutation { font-family:'Lora',serif; font-size:1.12rem; font-style:italic; color:var(--rose-light); margin-bottom:1.2rem; }
+    .letter-body { font-family:'Lora',serif; font-size:0.96rem; line-height:1.9; color:rgba(252,238,245,0.87); display:flex; flex-direction:column; gap:1.1rem; }
+    .letter-body p { position:relative; z-index:1; }
+    .em { color:var(--rose-light); font-style:italic; }
+    .letter-sign { margin-top:1.6rem; font-family:'Playfair Display',serif; font-size:1.05rem; font-style:italic; color:var(--rose-light); }
+    .signature { display:block; margin-top:0.3rem; font-size:1.45rem; color:var(--text-main); font-weight:500; }
+
+    /* ── FINAL LOVE SCREEN ── */
+    #screen-finale {
+      text-align: center;
+    }
+    .finale-hearts {
+      display: flex; justify-content: center; gap: 0.5rem;
+      font-size: 1.8rem; margin-bottom: 2rem;
+      animation: heartPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .finale-hearts span { display:inline-block; animation: float 3s ease-in-out infinite; }
+    .finale-hearts span:nth-child(2) { animation-delay: 0.3s; }
+    .finale-hearts span:nth-child(3) { animation-delay: 0.6s; }
+
+    @keyframes heartPop { from{opacity:0;transform:scale(0.3)} to{opacity:1;transform:scale(1)} }
+
+    .finale-headline {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 6vw, 2.6rem);
+      font-weight: 500;
+      line-height: 1.25;
+      color: var(--text-main);
+      margin-bottom: 1.2rem;
+      animation: screenIn 0.7s 0.2s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .finale-headline .love-line {
+      display: block;
+      background: linear-gradient(90deg, var(--rose-light), #f7c5d8, var(--rose));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .finale-sub {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--text-soft);
+      line-height: 1.7;
+      margin-bottom: 2.4rem;
+      animation: screenIn 0.7s 0.4s cubic-bezier(0.22,1,0.36,1) both;
+      opacity: 0;
+      animation-fill-mode: forwards;
+    }
+
+    .finale-ring {
+      position: relative; display: inline-block;
+      width: 90px; height: 90px; margin-bottom: 2rem;
+      animation: screenIn 0.6s 0.1s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    .finale-ring::before,
+    .finale-ring::after {
+      content: '';
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid transparent;
+    }
+    .finale-ring::before {
+      border-top-color: var(--rose);
+      border-right-color: var(--rose);
+      animation: spin 3s linear infinite;
+    }
+    .finale-ring::after {
+      border-bottom-color: rgba(232,120,154,0.3);
+      border-left-color: rgba(232,120,154,0.3);
+      animation: spin 3s linear infinite reverse;
+      inset: 8px;
+    }
+    .finale-ring-inner {
+      position: absolute; inset: 16px; border-radius: 50%;
+      background: radial-gradient(circle at 38% 35%, rgba(232,120,154,0.22), rgba(196,84,122,0.06));
+      border: 1px solid rgba(232,120,154,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+    }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+    /* ── BURST HEARTS ── */
+    .hearts-burst { position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:28px; }
+    .burst-heart {
+      position:absolute; font-size:1.2rem; opacity:0;
+      animation:burst 1.5s ease forwards;
+    }
+    @keyframes burst { 0%{opacity:1;transform:translate(0,0) scale(0.5)} 100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)} }
+
+    @media(max-width:480px){
+      .card{padding:2.4rem 1.6rem;border-radius:22px;}
+      .letter-paper{padding:1.8rem 1.3rem;}
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<div class="stage">
+  <div class="card" id="main-card">
+
+    <div class="hearts-burst" id="hearts-burst"></div>
+
+    <!-- SCREEN 1 — INTRO -->
+    <div class="screen active" id="screen-intro">
+      <div class="icon-badge">🌸</div>
+      <p class="eyebrow">A little something for you</p>
+      <h1 class="headline">Hey Lovie…<br>don't smile yet 😌</h1>
+      <p class="subtext">I made something for you.<br>Tap the button first — promise it's worth it.</p>
+      <button class="btn" onclick="goTo('screen-suspense')">Tap me &nbsp;✨</button>
+    </div>
+
+
+    <!-- SCREEN 2 — SUSPENSE (3 questions) -->
+    <div class="screen" id="screen-suspense">
+      <div class="icon-badge">🔒</div>
+      <p class="eyebrow">Before you continue…</p>
+      <h2 class="headline" style="font-size:clamp(1.35rem,4.5vw,1.85rem);margin-bottom:0.6rem;">A few quick questions</h2>
+
+      <div class="sep"><span></span><em>unlock the surprise</em><span></span></div>
+
+      <!-- Progress pips -->
+      <div class="quiz-progress">
+        <div class="q-pip active" id="pip-0"></div>
+        <div class="q-pip" id="pip-1"></div>
+        <div class="q-pip" id="pip-2"></div>
+      </div>
+
+      <!-- Q1 -->
+      <div class="quiz-step active" id="q-step-0">
+        <p class="suspense-question">"What do I always say when you ask me<br>why I like you so much?"</p>
+        <p class="suspense-hint" id="hint-0">Choose wisely 😏</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="checkQ(0,this,false)"><span class="ci">🤔</span> "I don't know, you're just cool I guess"</button>
+          <button class="choice-btn" onclick="checkQ(0,this,false)"><span class="ci">🙄</span> "Stop asking me that"</button>
+          <button class="choice-btn" onclick="checkQ(0,this,true)"><span class="ci">🥹</span> "Because it's just you. That's it."</button>
+          <button class="choice-btn" onclick="checkQ(0,this,false)"><span class="ci">😂</span> "Because you make me food sometimes"</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-step" id="q-step-1">
+        <p class="suspense-question">"What's my favourite thing we do together?"</p>
+        <p class="suspense-hint" id="hint-1">Think carefully 🤭</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="checkQ(1,this,false)"><span class="ci">🍕</span> Eating — obviously</button>
+          <button class="choice-btn" onclick="checkQ(1,this,true)"><span class="ci">🤫</span> Just being quiet next to each other</button>
+          <button class="choice-btn" onclick="checkQ(1,this,false)"><span class="ci">📺</span> Watching movies and falling asleep</button>
+          <button class="choice-btn" onclick="checkQ(1,this,false)"><span class="ci">🎮</span> Competing at literally everything</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-step" id="q-step-2">
+        <p class="suspense-question">"What do I do when I'm thinking about you<br>and you don't even know?"</p>
+        <p class="suspense-hint" id="hint-2">Last one, I promise 🌸</p>
+        <div class="choices">
+          <button class="choice-btn" onclick="checkQ(2,this,false)"><span class="ci">😴</span> Go back to sleep honestly</button>
+          <button class="choice-btn" onclick="checkQ(2,this,false)"><span class="ci">📱</span> Send a random meme</button>
+          <button class="choice-btn" onclick="checkQ(2,this,true)"><span class="ci">😊</span> Smile like an idiot for no reason</button>
+          <button class="choice-btn" onclick="checkQ(2,this,false)"><span class="ci">🎵</span> Play your favourite song</button>
+        </div>
+      </div>
+
+      <div class="nav-row" style="margin-top:1.4rem;">
+        <button class="btn-ghost" onclick="goTo('screen-intro')">← Back</button>
+        <button class="btn" id="suspense-next" disabled onclick="goTo('screen-messages')">Continue →</button>
+      </div>
+    </div>
+
+
+    <!-- SCREEN 3 — MESSAGES -->
+    <div class="screen" id="screen-messages">
+      <div class="icon-badge" id="msg-icon">💌</div>
+      <p class="eyebrow" id="msg-eyebrow">Something I've been meaning to say</p>
+
+      <div class="message-wrap" id="message-wrap"></div>
+      <div class="progress-dots" id="progress-dots"></div>
+
+      <div class="nav-row">
+        <button class="btn-ghost" id="back-msg-btn" onclick="prevMessage()">← Back</button>
+        <button class="btn" id="next-msg-btn" onclick="nextMessage()">Next →</button>
+      </div>
+    </div>
+
+
+    <!-- SCREEN 4 — LETTER -->
+    <div class="screen" id="screen-letter">
+      <div class="letter-center">
+        <div class="wax-seal">💌</div>
+        <p class="eyebrow">A letter. For you. Only you.</p>
+      </div>
+
+      <div class="letter-paper">
+        <p class="letter-date" id="letter-date"></p>
+        <p class="letter-salutation">My dearest Lovie,</p>
+
+        <div class="letter-body">
+          <p>
+            I don't always say the right things out loud — you know that about me.
+            So I thought I'd write it down, where I can actually think without
+            getting distracted by how pretty you look when you're listening.
+          </p>
+          <p>
+            You have this way of making ordinary moments feel like they matter.
+            A random afternoon, a dumb joke only we'd laugh at, just sitting next to you
+            quietly — those are my favourite things now. Because of you.
+          </p>
+          <p>
+            I think about you more than I let on. You cross my mind at the most
+            random times and I just… smile. Like an actual idiot. Every single time.
+          </p>
+          <p>
+            But here's the thing I really want you to know —
+            <span class="em">I cannot wait to have you in my arms again.</span>
+            Not in a dramatic way. Just in the quiet, aching,
+            <span class="em">"I miss the warmth of you"</span> kind of way.
+            The kind of hug where I don't want to be the first one to let go.
+            Where everything just… settles. That's what I'm waiting for, Lovie.
+          </p>
+          <p>
+            This isn't even the big thing. This is just a weekend surprise
+            because you deserve to be surprised for absolutely no reason at all.
+            You deserve little moments that say
+            <span class="em">"I thought of you"</span> — because I always do.
+          </p>
+          <p>
+            So here it is. Consider yourself thought of. Considered. Adored.
+            And very soon — held, properly, for as long as you'll let me. 🤍
+          </p>
+        </div>
+
+        <div class="letter-sign">
+          With everything,
+          <span class="signature">Adetola 💕</span>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-ghost" onclick="goTo('screen-messages')">← Back</button>
+        <button class="btn final-state" onclick="goToFinale()">❤️ I feel it too</button>
+      </div>
+    </div>
+
+
+    <!-- SCREEN 5 — FINALE -->
+    <div class="screen" id="screen-finale">
+      <div class="finale-ring">
+        <div class="finale-ring-inner">🌸</div>
+      </div>
+
+      <h2 class="finale-headline">
+        <span class="love-line">I love you so much,</span>
+        Lovie.
+      </h2>
+
+      <p class="finale-sub">
+        More than yesterday.<br>
+        And less than tomorrow. 🤍
+      </p>
+
+      <div class="finale-hearts">
+        <span>💗</span>
+        <span>🫶</span>
+        <span>💗</span>
+      </div>
+
+      <button class="btn final-state" onclick="triggerHeartBurst(); this.textContent='💕 Always & forever'; this.disabled=true;">
+        💕 Always &amp; forever
+      </button>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /stage -->
+
+
+<script>
+  /* ── MESSAGES DATA ── */
+  const messages = [
+    { text:"You're lowkey my favourite human 🤫",                    icon:"💌", eyebrow:"Something I've been meaning to say" },
+    { text:"I still don't understand how I got this lucky.",          icon:"🌷", eyebrow:"No seriously though…" },
+    { text:"You owe me a date, by the way 😏",                        icon:"😏", eyebrow:"Just so you know" },
+    { text:"I like you… like, a lot a lot.",                         icon:"🥹", eyebrow:"More than I usually admit" },
+    { text:"There's one more thing I really need you to read…",      icon:"✉️", eyebrow:"The real thing" },
+  ];
+
+  let currentMsg = 0;
+  let msgAnimating = false;
+
+  /* ── QUIZ STATE ── */
+  let quizStep = 0;
+  const quizAnswered = [false, false, false];
+
+  /* ── NAVIGATION ── */
+  function goTo(targetId) {
+    const current = document.querySelector('.screen.active');
+    if (!current || current.id === targetId) return;
+
+    current.classList.remove('active');
+    current.classList.add('exit');
+
+    setTimeout(() => {
+      current.classList.remove('exit');
+      const next = document.getElementById(targetId);
+      next.classList.add('active');
+      if (targetId === 'screen-messages') initMessages();
+      if (targetId === 'screen-letter')   initLetter();
+    }, 290);
+  }
+
+  function goToFinale() {
+    triggerHeartBurst();
+    setTimeout(() => goTo('screen-finale'), 400);
+  }
+
+  /* ── QUIZ ── */
+  function checkQ(stepIdx, btn, isCorrect) {
+    const allBtns = btn.closest('.choices').querySelectorAll('.choice-btn');
+    const hint    = document.getElementById(`hint-${stepIdx}`);
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      allBtns.forEach(b => { if (b !== btn) b.classList.add('locked'); });
+      hint.textContent = stepIdx === 0 ? "That's the one 🥹 You know me too well."
+                       : stepIdx === 1 ? "You know exactly 🤍 That's our thing."
+                       : "You caught me 😊 Every single time.";
+      hint.classList.add('hint-right');
+      quizAnswered[stepIdx] = true;
+
+      // Move to next step or unlock Continue
+      setTimeout(() => {
+        if (stepIdx < 2) {
+          advanceQuiz(stepIdx + 1);
+        } else {
+          document.getElementById('suspense-next').disabled = false;
+        }
+      }, 900);
+    } else {
+      btn.classList.add('wrong');
+      hint.textContent = "Hmm… try again 😏";
+      hint.classList.add('hint-wrong');
+      const card = document.getElementById('main-card');
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+      setTimeout(() => {
+        hint.classList.remove('hint-wrong');
+        hint.textContent = stepIdx === 0 ? "Choose wisely 😏"
+                         : stepIdx === 1 ? "Think carefully 🤭"
+                         : "Last one, I promise 🌸";
+        btn.classList.remove('wrong');
+      }, 1600);
+    }
+  }
+
+  function advanceQuiz(nextStep) {
+    // Update pips
+    document.getElementById(`pip-${nextStep - 1}`).classList.remove('active');
+    document.getElementById(`pip-${nextStep - 1}`).classList.add('done');
+    document.getElementById(`pip-${nextStep}`).classList.add('active');
+
+    // Swap steps
+    document.getElementById(`q-step-${nextStep - 1}`).classList.remove('active');
+    const next = document.getElementById(`q-step-${nextStep}`);
+    next.classList.add('active');
+    quizStep = nextStep;
+  }
+
+  /* ── MESSAGES: INIT ── */
+  function initMessages() {
+    const wrap = document.getElementById('message-wrap');
+    const dots = document.getElementById('progress-dots');
+    wrap.innerHTML = ''; dots.innerHTML = '';
+
+    messages.forEach((m, i) => {
+      const el = document.createElement('p');
+      el.className = 'message-text'; el.id = `msg-el-${i}`;
+      el.textContent = m.text; wrap.appendChild(el);
+
+      const dot = document.createElement('div');
+      dot.className = 'dot'; dot.id = `dot-${i}`; dots.appendChild(dot);
+    });
+
+    currentMsg = 0;
+    renderMessage(0, 'none');
+  }
+
+  function renderMessage(index, dir) {
+    const prev = currentMsg;
+    currentMsg = index;
+    msgAnimating = true;
+
+    if (dir !== 'none') {
+      const prevEl = document.getElementById(`msg-el-${prev}`);
+      if (prevEl) {
+        prevEl.classList.remove('visible');
+        prevEl.classList.add(dir === 'fwd' ? 'exit-up' : 'exit-down');
+        setTimeout(() => prevEl.classList.remove('exit-up','exit-down'), 550);
+      }
+    }
+
+    setTimeout(() => {
+      const el = document.getElementById(`msg-el-${index}`);
+      if (el) el.classList.add('visible');
+
+      document.getElementById('msg-icon').textContent    = messages[index].icon;
+      document.getElementById('msg-eyebrow').textContent = messages[index].eyebrow;
+
+      messages.forEach((_,i) => {
+        const d = document.getElementById(`dot-${i}`);
+        d.classList.remove('active','done');
+        if (i < index) d.classList.add('done');
+        if (i === index) d.classList.add('active');
+      });
+
+      document.getElementById('back-msg-btn').disabled = (index === 0);
+
+      const nextBtn = document.getElementById('next-msg-btn');
+      if (index === messages.length - 1) {
+        nextBtn.textContent = 'Read the letter 💌';
+        nextBtn.classList.add('final-state');
+        nextBtn.onclick = () => goTo('screen-letter');
+      } else {
+        nextBtn.textContent = 'Next →';
+        nextBtn.classList.remove('final-state');
+        nextBtn.onclick = nextMessage;
+      }
+
+      msgAnimating = false;
+    }, dir === 'none' ? 0 : 230);
+  }
+
+  function nextMessage() {
+    if (msgAnimating || currentMsg >= messages.length-1) return;
+    renderMessage(currentMsg+1, 'fwd');
+  }
+  function prevMessage() {
+    if (msgAnimating || currentMsg <= 0) return;
+    renderMessage(currentMsg-1, 'back');
+  }
+
+  /* ── LETTER DATE ── */
+  function initLetter() {
+    const el = document.getElementById('letter-date');
+    el.textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  }
+
+  /* ── HEART BURST ── */
+  function triggerHeartBurst() {
+    const c = document.getElementById('hearts-burst');
+    const hearts = ['❤️','🩷','💗','💕','✨','🌸','💖','🫶'];
+    for (let i=0;i<26;i++) {
+      setTimeout(()=>{
+        const h = document.createElement('span');
+        h.className = 'burst-heart';
+        h.textContent = hearts[Math.floor(Math.random()*hearts.length)];
+        const angle = Math.random()*360, dist = 90+Math.random()*130;
+        const dx = Math.cos(angle*Math.PI/180)*dist;
+        const dy = Math.sin(angle*Math.PI/180)*dist - 70;
+        h.style.cssText = `left:${38+Math.random()*24}%;top:${38+Math.random()*24}%;--dx:${dx}px;--dy:${dy}px;animation-delay:${Math.random()*0.5}s;font-size:${0.9+Math.random()*0.9}rem;`;
+        c.appendChild(h); setTimeout(()=>h.remove(),2100);
+      }, i*52);
+    }
+  }
+
+  /* ── PARTICLES ── */
+  const canvas = document.getElementById('particles-canvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, particles;
+
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+  window.addEventListener('resize',()=>{ resize(); initParticles(); });
+  resize();
+
+  const TYPES=['heart','sparkle','dot'];
+  function createParticle(randY){
+    const type=TYPES[Math.floor(Math.random()*TYPES.length)];
+    const size=type==='heart'?7+Math.random()*10:type==='sparkle'?2.5+Math.random()*4:1.5+Math.random()*2;
+    return{ type, x:Math.random()*W, y:randY?Math.random()*H:H+size+Math.random()*60,
+      size, speed:0.18+Math.random()*0.5, drift:(Math.random()-0.5)*0.38,
+      opacity:0.06+Math.random()*0.16, pulse:Math.random()*Math.PI*2, pulseSpd:0.011+Math.random()*0.018 };
+  }
+  function initParticles(){ particles=Array.from({length:60},()=>createParticle(true)); }
+  initParticles();
+
+  function drawHeart(cx,cy,r){
+    ctx.save(); ctx.translate(cx,cy); ctx.scale(r/10,r/10);
+    ctx.beginPath(); ctx.moveTo(0,-3);
+    ctx.bezierCurveTo(0,-6,-5,-6,-5,-2); ctx.bezierCurveTo(-5,1,0,5,0,5);
+    ctx.bezierCurveTo(0,5,5,1,5,-2); ctx.bezierCurveTo(5,-6,0,-6,0,-3);
+    ctx.closePath(); ctx.restore();
+  }
+  function drawSparkle(cx,cy,r){
+    ctx.save(); ctx.translate(cx,cy); ctx.beginPath();
+    for(let i=0;i<4;i++){
+      const a=i/4*Math.PI*2,ai=a+Math.PI/4;
+      if(i===0) ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);
+      else ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      ctx.lineTo(Math.cos(ai)*r*0.24,Math.sin(ai)*r*0.24);
+    }
+    ctx.closePath(); ctx.restore();
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.y-=p.speed; p.x+=p.drift; p.pulse+=p.pulseSpd;
+      const alpha=p.opacity*(0.65+0.35*Math.sin(p.pulse));
+      ctx.save(); ctx.globalAlpha=alpha;
+      if(p.type==='heart'){ drawHeart(p.x,p.y,p.size); ctx.fillStyle='#e8789a'; ctx.fill(); }
+      else if(p.type==='sparkle'){ drawSparkle(p.x,p.y,p.size); ctx.fillStyle='#f5c0d8'; ctx.fill(); }
+      else{ ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fillStyle='rgba(232,120,154,0.55)'; ctx.fill(); }
+      ctx.restore();
+      if(p.y<-20||p.x<-30||p.x>W+30) Object.assign(p,createParticle(false));
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+</script>
+</body>
+</html>
